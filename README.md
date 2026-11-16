@@ -8,7 +8,7 @@ La propuesta completa de arquitectura, datos, diseño y fases está en [docs/pro
 
 | Entrega | Estado |
 |---|---|
-| 1.0 Cimientos | Repositorio, estructura de capas, análisis y pruebas listos. **Pendiente:** proyecto de Firebase, inicio de sesión y firma de la app |
+| 1.0 Cimientos | Repositorio, estructura de capas, análisis, pruebas, proyecto de Firebase, reglas de seguridad e inicio de sesión con Google. **Pendiente:** activar el proveedor de Google en la consola, probar el acceso en un teléfono y firmar la app |
 | 1.1 Design System | Tokens, temas claro y oscuro, Inter, componentes base, catálogo y navegación con cinco pestañas |
 | 1.2 en adelante | Sin empezar |
 
@@ -40,6 +40,29 @@ flutter test
 
 Ambos deben quedar en verde antes de cerrar una entrega.
 
+Las reglas de seguridad de Firestore se prueban contra el emulador local (necesita Node y Java; no toca datos reales):
+
+```bash
+cd rules-test && npm install && npm test
+```
+
+## Firebase
+
+- Proyecto `master-pro-l6nu9`, plan gratuito Spark, sin cuenta de facturación.
+- Firestore en modo nativo, región `nam5`. Todo cuelga de `users/{uid}` y solo su dueño puede leerlo o escribirlo ([firestore.rules](firestore.rules)).
+- Inicio de sesión con Google. La app habla con la sesión a través de `AuthRepository`; Firebase queda detrás, en `features/auth/data`.
+- `lib/firebase_options.dart` y `android/app/google-services.json` los genera `flutterfire configure`. Son identificadores, no secretos. Si cambias algo en la consola (por ejemplo, activar un proveedor), vuelve a generarlos:
+
+```bash
+flutterfire configure --project=master-pro-l6nu9 --platforms=android,web --android-package-name=com.masterpro.master_pro --yes
+```
+
+- Publicar las reglas después de cambiarlas:
+
+```bash
+firebase deploy --only firestore:rules
+```
+
 ## Estructura
 
 ```
@@ -49,7 +72,10 @@ lib/
 ├─ core/
 │  ├─ design_system/       tokens, tema, componentes y catálogo
 │  └─ settings/            preferencias del dispositivo
-└─ features/<módulo>/      domain · data · presentation
+└─ features/<módulo>/      domain · data · presentation   (auth es el primero completo)
+
+rules-test/                pruebas de firestore.rules con el emulador
+test/support/              sesión y arranque en memoria para las pruebas
 ```
 
 Reglas:

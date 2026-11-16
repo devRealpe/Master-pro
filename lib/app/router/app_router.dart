@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/design_system/catalog/catalog_page.dart';
+import '../../features/auth/presentation/auth_providers.dart';
+import '../../features/auth/presentation/sign_in_page.dart';
 import '../../features/calendar/presentation/calendar_page.dart';
 import '../../features/home/presentation/home_page.dart';
 import '../../features/plan/presentation/plan_page.dart';
@@ -18,14 +20,54 @@ abstract final class AppRoutes {
   static const subjects = '/asignaturas';
   static const workspace = '/mi-espacio';
 
+  /// Mientras se restaura la sesión guardada.
+  static const splash = '/abriendo';
+  static const signIn = '/acceso';
+
   /// Solo existe en modo desarrollo.
   static const catalog = '/catalogo';
 }
 
+/// Decide a dónde va una navegación según la sesión: sin sesión, todo lleva
+/// al acceso; con sesión, el acceso lleva a Inicio. Devuelve `null` cuando la
+/// ruta pedida es válida.
+String? redirectForSession({
+  required bool restoring,
+  required bool signedIn,
+  required String location,
+}) {
+  if (restoring) {
+    return location == AppRoutes.splash ? null : AppRoutes.splash;
+  }
+  if (!signedIn) {
+    return location == AppRoutes.signIn ? null : AppRoutes.signIn;
+  }
+  if (location == AppRoutes.signIn || location == AppRoutes.splash) {
+    return AppRoutes.home;
+  }
+  return null;
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
+  // El router vuelve a evaluar la redirección cada vez que cambia la sesión.
+  final sessionChanges = ValueNotifier<int>(0);
+  ref.listen(authStateProvider, (_, _) => sessionChanges.value++);
+  ref.onDispose(sessionChanges.dispose);
+
   final router = GoRouter(
     initialLocation: AppRoutes.home,
+    refreshListenable: sessionChanges,
+    redirect: (context, state) {
+      final session = ref.read(authStateProvider);
+      return redirectForSession(
+        restoring: session.isLoading && !session.hasValue,
+        signedIn: session.value != null,
+        location: state.matchedLocation,
+      );
+    },
     routes: [
+      GoRoute(path: AppRoutes.splash, builder: (_, _) => const SplashPage()),
+      GoRoute(path: AppRoutes.signIn, builder: (_, _) => const SignInPage()),
       // Cada pestaña es una rama con su propio historial, que se conserva al
       // cambiar a otra.
       StatefulShellRoute.indexedStack(

@@ -7,6 +7,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../app/router/app_router.dart';
 import '../../../core/design_system/design_system.dart';
 import '../../../core/settings/theme_mode_controller.dart';
+import '../../auth/domain/auth_user.dart';
+import '../../auth/presentation/auth_providers.dart';
 
 /// Mi espacio: herramientas y ajustes. Las herramientas se agregan a medida
 /// que se construyen; no se listan las que todavía no funcionan.
@@ -16,13 +18,19 @@ class WorkspacePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mode = ref.watch(themeModeProvider);
+    final user = ref.watch(authStateProvider).value;
     final text = context.text;
     final c = context.colors;
 
     return AppPage(
       title: 'Mi espacio',
       children: [
+        if (user != null) ...[
+          FadeSlideIn(child: _AccountCard(user: user)),
+          const SizedBox(height: AppSpacing.sm),
+        ],
         FadeSlideIn(
+          index: 1,
           child: AppCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,7 +76,7 @@ class WorkspacePage extends ConsumerWidget {
         if (kDebugMode) ...[
           const SizedBox(height: AppSpacing.sm),
           FadeSlideIn(
-            index: 1,
+            index: 2,
             child: AppCard(
               onTap: () => context.push(AppRoutes.catalog),
               child: Row(
@@ -94,6 +102,97 @@ class WorkspacePage extends ConsumerWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+class _AccountCard extends ConsumerWidget {
+  const _AccountCard({required this.user});
+
+  final AuthUser user;
+
+  Future<void> _confirmSignOut(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Cerrar sesión?'),
+        content: const Text(
+          'Lo que ya se sincronizó sigue en tu cuenta. Si hay cambios sin '
+          'subir, espera a tener conexión antes de salir.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Cerrar sesión'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed ?? false) {
+      await ref.read(authRepositoryProvider).signOut();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final text = context.text;
+    final c = context.colors;
+    final email = user.email;
+
+    return AppCard(
+      child: Row(
+        children: [
+          ExcludeSemantics(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: c.primaryContainer,
+                shape: BoxShape.circle,
+              ),
+              child: SizedBox.square(
+                dimension: 44,
+                child: Center(
+                  child: Text(
+                    user.initials,
+                    style: text.labelLarge!.copyWith(
+                      color: c.onPrimaryContainer,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  user.label,
+                  style: text.titleMedium,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (email != null && email != user.label)
+                  Text(
+                    email,
+                    style: text.bodySmall,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+              ],
+            ),
+          ),
+          IconButton(
+            tooltip: 'Cerrar sesión',
+            icon: const Icon(LucideIcons.logOut),
+            onPressed: () => _confirmSignOut(context, ref),
+          ),
+        ],
+      ),
     );
   }
 }

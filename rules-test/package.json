@@ -1,0 +1,13 @@
+{
+  "name": "master-pro-rules-test",
+  "private": true,
+  "type": "module",
+  "description": "Pruebas de las reglas de seguridad de Firestore contra el emulador",
+  "scripts": {
+    "test": "firebase emulators:exec --only firestore --project demo-master-pro \"node --test\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.0",
+    "firebase": "^12.0.0"
+  }
+}
