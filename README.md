@@ -1,0 +1,70 @@
+# Master Pro
+
+Aplicación móvil personal para gestionar la maestría: asignaturas, entregas, calificaciones, calendario, documentos y estudio. Flutter + Firebase (solo plan gratuito).
+
+La propuesta completa de arquitectura, datos, diseño y fases está en [docs/propuesta-master-pro.md](docs/propuesta-master-pro.md). Léela antes de cambiar algo estructural.
+
+## Estado
+
+| Entrega | Estado |
+|---|---|
+| 1.0 Cimientos | Repositorio, estructura de capas, análisis y pruebas listos. **Pendiente:** proyecto de Firebase, inicio de sesión y firma de la app |
+| 1.1 Design System | Tokens, temas claro y oscuro, Inter, componentes base, catálogo y navegación con cinco pestañas |
+| 1.2 en adelante | Sin empezar |
+
+## Ejecutar
+
+```bash
+flutter pub get
+```
+
+```bash
+flutter run
+```
+
+Vista previa rápida de la interfaz en el navegador (no es un objetivo de producto):
+
+```bash
+flutter run -d chrome
+```
+
+## Verificar
+
+```bash
+flutter analyze
+```
+
+```bash
+flutter test
+```
+
+Ambos deben quedar en verde antes de cerrar una entrega.
+
+## Estructura
+
+```
+lib/
+├─ main.dart
+├─ app/                    arranque, router y estructura de pestañas
+├─ core/
+│  ├─ design_system/       tokens, tema, componentes y catálogo
+│  └─ settings/            preferencias del dispositivo
+└─ features/<módulo>/      domain · data · presentation
+```
+
+Reglas:
+
+- Las pantallas importan `core/design_system/design_system.dart` y no definen colores, tamaños ni duraciones propias.
+- El dominio no importa Flutter ni Firebase.
+- Material se importa desde `package:material_ui/material_ui.dart`. Desde Flutter 3.50, `package:flutter/material.dart` está obsoleto.
+
+## Design System
+
+El catálogo muestra todos los tokens y componentes en ambos temas. Solo existe en modo desarrollo: **Mi espacio → Design System**.
+
+La tipografía es Inter, empaquetada en `assets/fonts` (licencia OFL, incluida junto a la fuente).
+
+## Entorno de esta máquina
+
+- Flutter 3.50.0 (Dart 3.14). Hay otro Dart más antiguo en el PATH del sistema: usa siempre `flutter pub`, `flutter test` y `flutter analyze`, que traen el suyo.
+- Las apps de escritorio para Windows no están incluidas (falta Visual Studio con C++). No son un objetivo.
