@@ -6,6 +6,7 @@ export 'components/app_card.dart';
 export 'components/app_segmented.dart';
 export 'components/app_tag.dart';
 export 'components/brand_mark.dart';
+export 'components/choice_chips.dart';
 export 'components/content.dart';
 export 'components/fade_slide_in.dart';
 export 'components/form_fields.dart';

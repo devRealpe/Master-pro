@@ -5,10 +5,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/master_pro_app.dart';
 import 'core/settings/theme_mode_controller.dart';
+import 'core/time/deadline_clock.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  initializeTimeZones();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   final preferences = await SharedPreferences.getInstance();
 

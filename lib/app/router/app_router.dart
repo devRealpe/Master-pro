@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/design_system/catalog/catalog_page.dart';
+import '../../features/activities/presentation/activity_detail_page.dart';
+import '../../features/activities/presentation/activity_form_page.dart';
 import '../../features/auth/presentation/auth_providers.dart';
 import '../../features/auth/presentation/sign_in_page.dart';
 import '../../features/calendar/presentation/calendar_page.dart';
@@ -24,6 +26,11 @@ abstract final class AppRoutes {
   static const workspace = '/mi-espacio';
 
   // Pantallas completas, por encima de las pestañas.
+  static const newActivity = '/actividad/nueva';
+  static String newActivityFor(String subjectId) =>
+      '/actividad/nueva?asignatura=$subjectId';
+  static String activity(String id) => '/actividad/$id';
+  static String editActivity(String id) => '/actividad/$id/editar';
   static const newSubject = '/asignatura/nueva';
   static const periods = '/periodos';
   static String subject(String id) => '/asignatura/$id';
@@ -122,6 +129,24 @@ final routerProvider = Provider<GoRouter>((ref) {
                 builder: (_, _) => const WorkspacePage(),
               ),
             ],
+          ),
+        ],
+      ),
+      GoRoute(
+        path: AppRoutes.newActivity,
+        builder: (_, state) => ActivityFormPage(
+          subjectId: state.uri.queryParameters['asignatura'],
+        ),
+      ),
+      GoRoute(
+        path: '/actividad/:id',
+        builder: (_, state) =>
+            ActivityDetailPage(activityId: state.pathParameters['id']!),
+        routes: [
+          GoRoute(
+            path: 'editar',
+            builder: (_, state) =>
+                ActivityFormPage(activityId: state.pathParameters['id']),
           ),
         ],
       ),

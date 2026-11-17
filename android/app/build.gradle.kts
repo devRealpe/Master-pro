@@ -39,6 +39,12 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    // Workaround: AGP lint crashes on firebase_core (NoSuchMethodError List.removeLast).
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
 }
 
 kotlin {

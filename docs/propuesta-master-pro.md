@@ -197,7 +197,9 @@ Master Pro es sobre todo estado derivado de flujos, y ahí Riverpod es más dire
 
 Uso Riverpod **sin generador de código** (`Notifier`, `AsyncNotifier`, `StreamProvider`), para no depender de `build_runner` en cada cambio de interfaz.
 
-**Modelos escritos a mano (decisión de la entrega 1.2).** La propuesta original usaba `freezed` y `json_serializable`. Al instalarlos sobre Flutter 3.50 la resolución de dependencias no terminó, así que las entidades se escriben a mano: clases inmutables con `copyWith` (con centinela para poder dejar un campo vacío), igualdad y un mapeador aparte en la capa de datos. Tiene una ventaja: el dominio no conoce el formato de Firestore. El costo es más código por entidad, cubierto con pruebas de ida y vuelta. Se puede revisar más adelante si el número de entidades lo justifica.
+**Modelos escritos a mano (decisión de la entrega 1.2).** La propuesta original usaba `freezed` y `json_serializable`. Las entidades se escriben a mano: clases inmutables con `copyWith` (con centinela para poder dejar un campo vacío), igualdad y un mapeador aparte en la capa de datos. Ventajas: el dominio no conoce el formato de Firestore y no hay paso de generación. Costo: más código por entidad, cubierto con pruebas de ida y vuelta.
+
+Nota de honestidad: al tomar la decisión, la instalación de `freezed` se quedó colgada y lo atribuí a la resolución de dependencias. Después comprobé que la causa era otra (un `flutter run` abierto en la terminal bloqueaba la herramienta), así que `freezed` probablemente sí se instala. La decisión se mantiene por las ventajas de arriba y porque ya hay tres entidades hechas así; se puede revisar si el número de entidades lo justifica.
 
 ### 5.3 Dependencias
 

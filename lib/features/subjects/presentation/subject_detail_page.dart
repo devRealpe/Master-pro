@@ -7,6 +7,9 @@ import '../../../app/router/app_router.dart';
 import '../../../core/design_system/design_system.dart';
 import '../../../core/sync/write_guard.dart';
 import '../../../core/time/dates.dart';
+import '../../activities/domain/activity.dart';
+import '../../activities/presentation/activities_providers.dart';
+import '../../activities/presentation/activity_card.dart';
 import '../domain/period.dart';
 import '../domain/subject.dart';
 import 'subject_form_page.dart';
@@ -214,20 +217,8 @@ class _Detail extends ConsumerWidget {
               ),
             ),
           ],
-          const SizedBox(height: AppSpacing.sm),
-          const FadeSlideIn(
-            index: 3,
-            child: AppCard(
-              child: EmptyState(
-                icon: LucideIcons.layers,
-                title: 'Aquí se reunirá todo',
-                message:
-                    'Actividades, calificaciones, clases, exámenes, '
-                    'material y apuntes de esta asignatura.',
-                footer: AppTag(label: 'Llega con las próximas entregas'),
-              ),
-            ),
-          ),
+          const SizedBox(height: AppSpacing.lg),
+          FadeSlideIn(index: 3, child: _SubjectActivities(subject: subject)),
         ],
       ),
     );
@@ -290,6 +281,68 @@ class _TimelineCard extends StatelessWidget {
           Text(status, style: text.bodyMedium!.copyWith(color: c.inkSoft)),
         ],
       ),
+    );
+  }
+}
+
+/// Actividades pendientes de la asignatura.
+class _SubjectActivities extends ConsumerWidget {
+  const _SubjectActivities({required this.subject});
+
+  final Subject subject;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final all = ref.watch(activitiesProvider).value ?? const <Activity>[];
+    final mine = [
+      for (final a in all)
+        if (a.subjectId == subject.id) a,
+    ];
+    final pending = [
+      for (final a in mine)
+        if (!a.isDone) a,
+    ];
+    final done = mine.length - pending.length;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionHeader(
+          title: 'Actividades',
+          actionLabel: 'Agregar',
+          onAction: () => context.push(AppRoutes.newActivityFor(subject.id)),
+        ),
+        if (done > 0)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+            child: Text(
+              done == 1 ? '1 hecha' : '$done hechas',
+              style: context.text.bodySmall,
+            ),
+          ),
+        if (pending.isEmpty)
+          AppCard(
+            child: EmptyState(
+              icon: LucideIcons.listTodo,
+              title: mine.isEmpty
+                  ? 'Sin actividades todavía'
+                  : 'Nada pendiente aquí',
+              message: mine.isEmpty
+                  ? 'Agrega los trabajos y test de esta asignatura.'
+                  : 'Todas las actividades de esta asignatura están hechas.',
+            ),
+          )
+        else
+          for (final activity in pending)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+              child: ActivityCard(
+                activity: activity,
+                subject: null,
+                onTap: () => context.push(AppRoutes.activity(activity.id)),
+              ),
+            ),
+      ],
     );
   }
 }

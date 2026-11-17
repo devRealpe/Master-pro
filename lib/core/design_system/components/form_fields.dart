@@ -75,6 +75,62 @@ class DateField extends StatelessWidget {
   }
 }
 
+/// Campo de hora en formato de 24 horas.
+class TimeField extends StatelessWidget {
+  const TimeField({
+    super.key,
+    required this.label,
+    required this.hour,
+    required this.minute,
+    required this.onChanged,
+  });
+
+  final String label;
+  final int hour;
+  final int minute;
+  final void Function(int hour, int minute) onChanged;
+
+  static String format(int hour, int minute) =>
+      '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+
+  Future<void> _pick(BuildContext context) async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: hour, minute: minute),
+      helpText: label,
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
+      ),
+    );
+    if (picked != null) onChanged(picked.hour, picked.minute);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: AppRadii.md,
+      onTap: () => _pick(context),
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: label,
+          suffixIcon: Icon(
+            LucideIcons.clock,
+            size: 20,
+            color: context.colors.inkMuted,
+          ),
+        ),
+        child: Text(
+          format(hour, minute),
+          style: context.text.bodyLarge!.copyWith(
+            fontFeatures: AppTypography.tabular,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// Selector de color de asignatura. Cada opción lleva su nombre para el
 /// lector de pantalla y una marca cuando está elegida.
 class SubjectColorPicker extends StatelessWidget {
