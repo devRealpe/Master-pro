@@ -16,6 +16,10 @@ void main() {
     expect(google(GoogleSignInExceptionCode.canceled), AuthFailure.cancelled);
   });
 
+  test('ventana emergente bloqueada por el navegador', () {
+    expect(firebase('popup-blocked'), AuthFailure.popupBlocked);
+  });
+
   test('sin red', () {
     expect(firebase('network-request-failed'), AuthFailure.network);
   });

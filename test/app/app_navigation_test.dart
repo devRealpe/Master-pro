@@ -49,7 +49,7 @@ void main() {
   });
 
   testWidgets('el tema elegido se aplica y se recuerda', (tester) async {
-    final preferences = await pumpApp(tester);
+    final preferences = (await pumpApp(tester)).preferences;
     await tester.tap(find.text('Mi espacio'));
     await tester.pumpAndSettle();
 

@@ -84,6 +84,40 @@ void main() {
     });
   });
 
+  group('Acceso en pantallas pequeñas', () {
+    for (final (size, scale) in [
+      (const Size(360, 420), 1.0),
+      (const Size(320, 480), 1.5),
+      (const Size(640, 360), 1.0),
+    ]) {
+      testWidgets(
+        'con error visible no se desborda · ${size.width.toInt()}×${size.height.toInt()} · texto x$scale',
+        (tester) async {
+          tester.view.physicalSize = size;
+          tester.view.devicePixelRatio = 1;
+          tester.platformDispatcher.textScaleFactorTestValue = scale;
+          addTearDown(tester.view.reset);
+          addTearDown(tester.platformDispatcher.clearAllTestValues);
+
+          final auth = FakeAuthRepository()..failure = AuthFailure.popupBlocked;
+          await pumpApp(tester, auth: auth);
+          expect(tester.takeException(), isNull);
+
+          final button = find.text('Continuar con Google');
+          await tester.ensureVisible(button);
+          await tester.tap(button);
+          await tester.pumpAndSettle();
+
+          expect(tester.takeException(), isNull);
+          expect(find.text(AuthFailure.popupBlocked.message), findsOneWidget);
+          await tester.ensureVisible(button);
+          await tester.pumpAndSettle();
+          expect(button.hitTestable(), findsOneWidget);
+        },
+      );
+    }
+  });
+
   group('Cerrar sesión', () {
     Future<void> openSignOutDialog(WidgetTester tester) async {
       await tester.tap(find.text('Mi espacio'));

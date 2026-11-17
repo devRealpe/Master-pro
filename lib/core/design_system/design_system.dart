@@ -8,6 +8,7 @@ export 'components/app_tag.dart';
 export 'components/brand_mark.dart';
 export 'components/content.dart';
 export 'components/fade_slide_in.dart';
+export 'components/form_fields.dart';
 export 'components/pressable.dart';
 export 'components/progress.dart';
 export 'components/states.dart';

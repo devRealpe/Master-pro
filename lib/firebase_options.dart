@@ -65,5 +65,4 @@ class DefaultFirebaseOptions {
     projectId: 'master-pro-l6nu9',
     storageBucket: 'master-pro-l6nu9.firebasestorage.app',
   );
-
 }

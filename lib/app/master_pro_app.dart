@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/design_system/design_system.dart';
 import '../core/settings/theme_mode_controller.dart';
+import '../core/sync/write_guard.dart';
 import 'router/app_router.dart';
 
 class MasterProApp extends ConsumerWidget {
@@ -13,6 +14,7 @@ class MasterProApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Master Pro',
       debugShowCheckedModeBanner: false,
+      scaffoldMessengerKey: scaffoldMessengerKey,
       routerConfig: ref.watch(routerProvider),
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,

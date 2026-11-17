@@ -24,6 +24,7 @@ AuthFailure mapAuthError(Object error) {
       'web-context-cancelled' ||
       'canceled' => AuthFailure.cancelled,
       'network-request-failed' => AuthFailure.network,
+      'popup-blocked' => AuthFailure.popupBlocked,
       // Registro de cuentas nuevas desactivado, o cuenta deshabilitada.
       'admin-restricted-operation' || 'user-disabled' => AuthFailure.notAllowed,
       // Proveedor de Google sin activar en la consola.

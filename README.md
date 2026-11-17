@@ -8,9 +8,10 @@ La propuesta completa de arquitectura, datos, diseño y fases está en [docs/pro
 
 | Entrega | Estado |
 |---|---|
-| 1.0 Cimientos | Repositorio, estructura de capas, análisis, pruebas, proyecto de Firebase, reglas de seguridad e inicio de sesión con Google. **Pendiente:** activar el proveedor de Google en la consola, probar el acceso en un teléfono y firmar la app |
+| 1.0 Cimientos | Repositorio, estructura de capas, análisis, pruebas, proyecto de Firebase, reglas de seguridad e inicio de sesión con Google. **Pendiente:** desactivar el registro de cuentas nuevas en la consola, probar el acceso en un teléfono y firmar la app |
 | 1.1 Design System | Tokens, temas claro y oscuro, Inter, componentes base, catálogo y navegación con cinco pestañas |
-| 1.2 en adelante | Sin empezar |
+| 1.2 Asignaturas | Asignaturas (alta, edición, detalle, finalizar, papelera con deshacer), historial, periodos con fechas clave y calendario UNIR 2026–2027 «por confirmar». Probado con datos en memoria; **pendiente** verlo funcionando contra Firestore real |
+| 1.3 en adelante | Sin empezar |
 
 ## Ejecutar
 
@@ -82,6 +83,8 @@ Reglas:
 
 - Las pantallas importan `core/design_system/design_system.dart` y no definen colores, tamaños ni duraciones propias.
 - El dominio no importa Flutter ni Firebase.
+- Los datos se leen y escriben a través de `EntityRepository`. Las escrituras no se esperan en la interfaz (`guardWrite`): sin conexión quedan en cola y el cambio ya se ve en pantalla.
+- Las fechas sin hora se guardan como `aaaa-mm-dd` (`core/time/dates.dart`); nunca se convierten entre zonas horarias.
 - Material se importa desde `package:material_ui/material_ui.dart`. Desde Flutter 3.50, `package:flutter/material.dart` está obsoleto.
 
 ## Design System

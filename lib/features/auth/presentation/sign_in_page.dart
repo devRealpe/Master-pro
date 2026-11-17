@@ -15,11 +15,6 @@ class SignInPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
-    final text = context.text;
-    final state = ref.watch(signInControllerProvider);
-    final failure = state.error is AuthFailure
-        ? state.error! as AuthFailure
-        : null;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       // Iconos claros sobre el degradado, en ambos temas.
@@ -29,89 +24,112 @@ class SignInPage extends ConsumerWidget {
       ),
       child: Scaffold(
         backgroundColor: c.surface,
-        body: Column(
-          children: [
-            Expanded(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: c.brandGradient,
-                  borderRadius: const BorderRadius.vertical(
-                    bottom: Radius.circular(32),
-                  ),
-                ),
-                child: SafeArea(
-                  bottom: false,
-                  child: Center(
-                    child: FadeSlideIn(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const BrandMark(size: 80, onGradient: true),
-                          const SizedBox(height: AppSpacing.lg),
-                          Text(
-                            'Master Pro',
-                            style: text.displaySmall!.copyWith(
-                              color: c.onGradient,
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.xxs),
-                          Text(
-                            'Tu centro de control académico',
-                            style: text.bodyLarge!.copyWith(
-                              color: c.onGradient.withValues(alpha: 0.85),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+        // En pantallas altas el degradado ocupa todo el espacio libre; en las
+        // bajas (teclado abierto, ventana pequeña, texto ampliado) la página
+        // se desplaza en vez de desbordarse.
+        body: LayoutBuilder(
+          builder: (context, viewport) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: viewport.maxHeight),
+              child: IntrinsicHeight(child: _layout(context, ref)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _layout(BuildContext context, WidgetRef ref) {
+    final c = context.colors;
+    final text = context.text;
+    final state = ref.watch(signInControllerProvider);
+    final failure = state.error is AuthFailure
+        ? state.error! as AuthFailure
+        : null;
+
+    return Column(
+      children: [
+        Expanded(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: c.brandGradient,
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(32),
               ),
             ),
-            SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.screen,
-                  AppSpacing.xl,
-                  AppSpacing.screen,
-                  AppSpacing.xl,
-                ),
+            child: SafeArea(
+              bottom: false,
+              minimum: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screen,
+                vertical: AppSpacing.xxl,
+              ),
+              child: Center(
                 child: FadeSlideIn(
-                  index: 2,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Entra con tu cuenta', style: text.titleLarge),
+                      const BrandMark(size: 80, onGradient: true),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text(
+                        'Master Pro',
+                        style: text.displaySmall!.copyWith(color: c.onGradient),
+                      ),
                       const SizedBox(height: AppSpacing.xxs),
                       Text(
-                        'Tus asignaturas, entregas y notas se sincronizan '
-                        'con ella. Los archivos se quedan en este teléfono.',
-                        style: text.bodyMedium!.copyWith(color: c.inkSoft),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      if (failure != null) ...[
-                        _FailureNotice(failure.message),
-                        const SizedBox(height: AppSpacing.sm),
-                      ],
-                      AppButton(
-                        label: 'Continuar con Google',
-                        icon: LucideIcons.logIn,
-                        expand: true,
-                        loading: state.isLoading,
-                        onPressed: ref
-                            .read(signInControllerProvider.notifier)
-                            .signIn,
+                        'Tu centro de control académico',
+                        style: text.bodyLarge!.copyWith(
+                          color: c.onGradient.withValues(alpha: 0.85),
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-          ],
+          ),
         ),
-      ),
+        SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screen,
+              AppSpacing.xl,
+              AppSpacing.screen,
+              AppSpacing.xl,
+            ),
+            child: FadeSlideIn(
+              index: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Entra con tu cuenta', style: text.titleLarge),
+                  const SizedBox(height: AppSpacing.xxs),
+                  Text(
+                    'Tus asignaturas, entregas y notas se sincronizan '
+                    'con ella. Los archivos se quedan en este teléfono.',
+                    style: text.bodyMedium!.copyWith(color: c.inkSoft),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  if (failure != null) ...[
+                    _FailureNotice(failure.message),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  AppButton(
+                    label: 'Continuar con Google',
+                    icon: LucideIcons.logIn,
+                    expand: true,
+                    loading: state.isLoading,
+                    onPressed: ref
+                        .read(signInControllerProvider.notifier)
+                        .signIn,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

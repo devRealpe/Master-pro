@@ -195,7 +195,9 @@ La lógica con reglas reales vive en servicios de dominio puros:
 
 Master Pro es sobre todo estado derivado de flujos, y ahí Riverpod es más directo. Bloc sería mejor elección con un equipo grande que necesite auditar cada transición, que no es el caso.
 
-Uso Riverpod **sin generador de código** (`Notifier`, `AsyncNotifier`, `StreamProvider`), para no depender de `build_runner` en cada cambio de interfaz. Sí uso generación para los modelos (`freezed` + `json_serializable`): unas 18 entidades con `copyWith`, igualdad y mapeo escritos a mano son una fuente de errores silenciosos.
+Uso Riverpod **sin generador de código** (`Notifier`, `AsyncNotifier`, `StreamProvider`), para no depender de `build_runner` en cada cambio de interfaz.
+
+**Modelos escritos a mano (decisión de la entrega 1.2).** La propuesta original usaba `freezed` y `json_serializable`. Al instalarlos sobre Flutter 3.50 la resolución de dependencias no terminó, así que las entidades se escriben a mano: clases inmutables con `copyWith` (con centinela para poder dejar un campo vacío), igualdad y un mapeador aparte en la capa de datos. Tiene una ventaja: el dominio no conoce el formato de Firestore. El costo es más código por entidad, cubierto con pruebas de ida y vuelta. Se puede revisar más adelante si el número de entidades lo justifica.
 
 ### 5.3 Dependencias
 
@@ -206,7 +208,7 @@ Las versiones se fijan al instalar, con `flutter pub add`, comprobando la compat
 | Firebase | `firebase_core`, `firebase_auth`, `cloud_firestore`, `google_sign_in` | Oficiales; todos dentro del plan gratuito |
 | Estado | `flutter_riverpod` | §5.2 |
 | Navegación | `go_router` | Mantenido por el equipo de Flutter; pestañas con estado propio y enlaces profundos desde notificaciones |
-| Modelos | `freezed_annotation`, `json_annotation` (+ `freezed`, `json_serializable`, `build_runner` en desarrollo) | Inmutabilidad y mapeo seguros |
+| Modelos | Ninguna: clases y mapeadores escritos a mano (§5.2) | Sin paso de generación |
 | Fechas | `intl`, `timezone`, `flutter_timezone` | Formato es-CO y base de zonas horarias con cambios de horario |
 | Avisos | `flutter_local_notifications` | Estándar para notificaciones programadas |
 | Archivos | `file_picker`, `path_provider`, `share_plus`, `archive` | Selección, almacenamiento privado, respaldo en ZIP y exportación |

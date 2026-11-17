@@ -8,6 +8,9 @@ import '../../features/auth/presentation/sign_in_page.dart';
 import '../../features/calendar/presentation/calendar_page.dart';
 import '../../features/home/presentation/home_page.dart';
 import '../../features/plan/presentation/plan_page.dart';
+import '../../features/subjects/presentation/periods_page.dart';
+import '../../features/subjects/presentation/subject_detail_page.dart';
+import '../../features/subjects/presentation/subject_form_page.dart';
 import '../../features/subjects/presentation/subjects_page.dart';
 import '../../features/workspace/presentation/workspace_page.dart';
 import '../shell/app_shell.dart';
@@ -19,6 +22,12 @@ abstract final class AppRoutes {
   static const calendar = '/calendario';
   static const subjects = '/asignaturas';
   static const workspace = '/mi-espacio';
+
+  // Pantallas completas, por encima de las pestañas.
+  static const newSubject = '/asignatura/nueva';
+  static const periods = '/periodos';
+  static String subject(String id) => '/asignatura/$id';
+  static String editSubject(String id) => '/asignatura/$id/editar';
 
   /// Mientras se restaura la sesión guardada.
   static const splash = '/abriendo';
@@ -113,6 +122,23 @@ final routerProvider = Provider<GoRouter>((ref) {
                 builder: (_, _) => const WorkspacePage(),
               ),
             ],
+          ),
+        ],
+      ),
+      GoRoute(
+        path: AppRoutes.newSubject,
+        builder: (_, _) => const SubjectFormPage(),
+      ),
+      GoRoute(path: AppRoutes.periods, builder: (_, _) => const PeriodsPage()),
+      GoRoute(
+        path: '/asignatura/:id',
+        builder: (_, state) =>
+            SubjectDetailPage(subjectId: state.pathParameters['id']!),
+        routes: [
+          GoRoute(
+            path: 'editar',
+            builder: (_, state) =>
+                SubjectFormPage(subjectId: state.pathParameters['id']),
           ),
         ],
       ),
