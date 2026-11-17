@@ -23,6 +23,13 @@ final _allClassSessionsProvider = StreamProvider<List<ClassSession>>(
   (ref) => ref.watch(classSessionsRepositoryProvider).watchAll(),
 );
 
+/// Todas las clases vigentes, de la más reciente a la más antigua.
+final classSessionsProvider = Provider<AsyncValue<List<ClassSession>>>(
+  (ref) => ref
+      .watch(_allClassSessionsProvider)
+      .whenData((all) => sortClassSessions(all.where((s) => !s.isDeleted))),
+);
+
 /// Clases vigentes de una asignatura, de la más reciente a la más antigua.
 final subjectClassSessionsProvider =
     Provider.family<AsyncValue<List<ClassSession>>, String>(

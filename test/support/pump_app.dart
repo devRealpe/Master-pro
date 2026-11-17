@@ -10,6 +10,8 @@ import 'package:master_pro/core/time/deadline_clock.dart';
 import 'package:master_pro/features/activities/domain/activity.dart';
 import 'package:master_pro/features/activities/presentation/activities_providers.dart';
 import 'package:master_pro/features/auth/presentation/auth_providers.dart';
+import 'package:master_pro/features/calendar/domain/study_block.dart';
+import 'package:master_pro/features/calendar/presentation/calendar_providers.dart';
 import 'package:master_pro/features/classes/domain/class_session.dart';
 import 'package:master_pro/features/grades/presentation/grades_providers.dart';
 import 'package:master_pro/features/subjects/domain/period.dart';
@@ -55,11 +57,16 @@ class TestBackend {
     List<Period> periods = const [],
     List<Activity> activities = const [],
     List<ClassSession> classSessions = const [],
+    List<StudyBlock> studyBlocks = const [],
   }) : auth = auth ?? FakeAuthRepository.signedIn(),
        activities = InMemoryRepository(idOf: (a) => a.id, initial: activities),
        classSessions = InMemoryRepository(
          idOf: (c) => c.id,
          initial: classSessions,
+       ),
+       studyBlocks = InMemoryRepository(
+         idOf: (b) => b.id,
+         initial: studyBlocks,
        ),
        subjects = InMemoryRepository(idOf: (s) => s.id, initial: subjects),
        periods = InMemoryRepository(idOf: (p) => p.id, initial: periods);
@@ -69,6 +76,7 @@ class TestBackend {
   final InMemoryRepository<Period> periods;
   final InMemoryRepository<Activity> activities;
   final InMemoryRepository<ClassSession> classSessions;
+  final InMemoryRepository<StudyBlock> studyBlocks;
   late final SharedPreferences preferences;
 }
 
@@ -95,6 +103,7 @@ Future<TestBackend> pumpApp(
         activitiesRepositoryProvider.overrideWithValue(target.activities),
         clockProvider.overrideWithValue(() => testNow),
         classSessionsRepositoryProvider.overrideWithValue(target.classSessions),
+        studyBlocksRepositoryProvider.overrideWithValue(target.studyBlocks),
         toLocalProvider.overrideWithValue(toBogota),
         fromLocalProvider.overrideWithValue(fromBogota),
       ],

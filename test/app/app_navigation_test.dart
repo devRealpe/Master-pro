@@ -31,7 +31,7 @@ void main() {
 
     const expected = {
       'Plan': 'Aún no hay actividades',
-      'Calendario': 'Nada en el calendario',
+      'Calendario': 'Semana',
       'Asignaturas': 'Registra tus asignaturas',
       'Mi espacio': 'Apariencia',
       'Inicio': 'Tu centro académico',
