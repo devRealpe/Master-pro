@@ -10,6 +10,8 @@ import 'package:master_pro/core/time/deadline_clock.dart';
 import 'package:master_pro/features/activities/domain/activity.dart';
 import 'package:master_pro/features/activities/presentation/activities_providers.dart';
 import 'package:master_pro/features/auth/presentation/auth_providers.dart';
+import 'package:master_pro/features/classes/domain/class_session.dart';
+import 'package:master_pro/features/grades/presentation/grades_providers.dart';
 import 'package:master_pro/features/subjects/domain/period.dart';
 import 'package:master_pro/features/subjects/domain/subject.dart';
 import 'package:master_pro/features/subjects/presentation/subjects_providers.dart';
@@ -27,6 +29,17 @@ final testNow = DateTime.utc(2026, 11, 16, 17);
 DateTime toBogota(DateTime instant) =>
     tz.TZDateTime.from(instant, tz.getLocation('America/Bogota'));
 
+/// Inversa de [toBogota]: una fecha y hora de pared en Colombia, como
+/// instante.
+DateTime fromBogota(DateTime wall) => tz.TZDateTime(
+  tz.getLocation('America/Bogota'),
+  wall.year,
+  wall.month,
+  wall.day,
+  wall.hour,
+  wall.minute,
+).toUtc();
+
 /// Un teléfono alto, para que los formularios quepan sin desplazar.
 void useTallPhone(WidgetTester tester) {
   tester.view.physicalSize = const Size(400, 2400);
@@ -41,8 +54,13 @@ class TestBackend {
     List<Subject> subjects = const [],
     List<Period> periods = const [],
     List<Activity> activities = const [],
+    List<ClassSession> classSessions = const [],
   }) : auth = auth ?? FakeAuthRepository.signedIn(),
        activities = InMemoryRepository(idOf: (a) => a.id, initial: activities),
+       classSessions = InMemoryRepository(
+         idOf: (c) => c.id,
+         initial: classSessions,
+       ),
        subjects = InMemoryRepository(idOf: (s) => s.id, initial: subjects),
        periods = InMemoryRepository(idOf: (p) => p.id, initial: periods);
 
@@ -50,6 +68,7 @@ class TestBackend {
   final InMemoryRepository<Subject> subjects;
   final InMemoryRepository<Period> periods;
   final InMemoryRepository<Activity> activities;
+  final InMemoryRepository<ClassSession> classSessions;
   late final SharedPreferences preferences;
 }
 
@@ -75,7 +94,9 @@ Future<TestBackend> pumpApp(
         periodsRepositoryProvider.overrideWithValue(target.periods),
         activitiesRepositoryProvider.overrideWithValue(target.activities),
         clockProvider.overrideWithValue(() => testNow),
+        classSessionsRepositoryProvider.overrideWithValue(target.classSessions),
         toLocalProvider.overrideWithValue(toBogota),
+        fromLocalProvider.overrideWithValue(fromBogota),
       ],
       child: const MasterProApp(),
     ),

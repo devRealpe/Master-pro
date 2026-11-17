@@ -12,7 +12,8 @@ La propuesta completa de arquitectura, datos, diseño y fases está en [docs/pro
 | 1.1 Design System | Tokens, temas claro y oscuro, Inter, componentes base, catálogo y navegación con cinco pestañas |
 | 1.2 Asignaturas | Asignaturas (alta, edición, detalle, finalizar, papelera con deshacer), historial, periodos con fechas clave y calendario UNIR 2026–2027 «por confirmar». Comprobado contra Firestore real (lectura, carga del calendario y formulario) |
 | 1.3 Actividades | Actividades con fecha límite en hora de España y colchón, pasos (subtareas), estados, entrega con fecha real, papelera con deshacer, lista del Plan agrupada por urgencia con filtros, y actividades dentro de cada asignatura. Probado con datos en memoria; **pendiente** verlo funcionando contra Firestore real |
-| 1.4 en adelante | Sin empezar |
+| 1.4 Calificaciones | Reglas de evaluación por asignatura (plantilla UNIR), valor y nota de cada actividad, clases en vivo con asistencia, marcador de evaluación continua y simulador. Calcula puntos, no la nota final de 0 a 10. Probado con datos en memoria; **pendiente** verlo con datos reales |
+| 1.5 en adelante | Sin empezar |
 
 ## Ejecutar
 
@@ -87,6 +88,8 @@ Reglas:
 - Los datos se leen y escriben a través de `EntityRepository`. Las escrituras no se esperan en la interfaz (`guardWrite`): sin conexión quedan en cola y el cambio ya se ve en pantalla.
 - Las fechas sin hora se guardan como `aaaa-mm-dd` (`core/time/dates.dart`); nunca se convierten entre zonas horarias.
 - Las fechas límite son instantes UTC. La conversión desde la hora de España está en `core/time/deadline_clock.dart`; las pantallas leen la hora actual y la zona local de `core/time/clock_providers.dart`, que las pruebas fijan.
+- Los puntos los calcula `GradeCalculator` (`features/grades/domain`), que es lógica pura. El simulador llama a la misma función con hipótesis en memoria: no hay forma de que escriba notas.
+- Una tarjeta (`AppCard`) ya incluye su superficie Material: dentro se pueden poner interruptores, casillas y filas de lista sin envolverlos.
 - Material se importa desde `package:material_ui/material_ui.dart`. Desde Flutter 3.50, `package:flutter/material.dart` está obsoleto.
 
 ## Design System

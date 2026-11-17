@@ -1,4 +1,5 @@
 import '../../../core/time/dates.dart';
+import '../../grades/domain/grading_scheme.dart';
 
 enum SubjectStatus {
   planned('Próxima'),
@@ -25,6 +26,7 @@ class Subject {
     this.endDate,
     this.status = SubjectStatus.active,
     this.colorIndex = 0,
+    this.grading = GradingScheme.unir,
     this.deletedAt,
   });
 
@@ -43,6 +45,9 @@ class Subject {
 
   /// Posición en la paleta de colores de asignatura del Design System.
   final int colorIndex;
+
+  /// Reglas de evaluación. Por omisión, las de UNIR.
+  final GradingScheme grading;
 
   /// Momento en que se envió a la papelera, o `null` si está vigente.
   final DateTime? deletedAt;
@@ -73,6 +78,7 @@ class Subject {
     Object? endDate = _keep,
     SubjectStatus? status,
     int? colorIndex,
+    GradingScheme? grading,
     Object? deletedAt = _keep,
   }) => Subject(
     id: id,
@@ -86,6 +92,7 @@ class Subject {
     endDate: identical(endDate, _keep) ? this.endDate : endDate as DateTime?,
     status: status ?? this.status,
     colorIndex: colorIndex ?? this.colorIndex,
+    grading: grading ?? this.grading,
     deletedAt: identical(deletedAt, _keep)
         ? this.deletedAt
         : deletedAt as DateTime?,
@@ -103,6 +110,7 @@ class Subject {
       other.endDate == endDate &&
       other.status == status &&
       other.colorIndex == colorIndex &&
+      other.grading == grading &&
       other.deletedAt == deletedAt;
 
   @override
@@ -116,6 +124,7 @@ class Subject {
     endDate,
     status,
     colorIndex,
+    grading,
     deletedAt,
   );
 }

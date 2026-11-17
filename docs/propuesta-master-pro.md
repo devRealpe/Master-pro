@@ -417,6 +417,8 @@ Ejemplo con la plantilla: una actividad de valor 5 con 8,5 (4,25 puntos), dos cl
 
 **El simulador** llama a la misma función con una lista de notas hipotéticas que solo existe en memoria. No hay forma de que modifique las notas reales, porque nunca se escribe.
 
+**Lo construido en la entrega 1.4.** El esquema implementado tiene dos partes fijas, evaluación continua por puntos y examen, con todos sus parámetros editables por asignatura (escala, meta, puntos por clase y por test, pesos). Cada actividad lleva su propio valor, así que trabajos, test, participación u otras actividades entran como elementos que suman puntos. No se construyó todavía el modo «promedio ponderado» ni componentes definidos por el usuario: ninguna de tus asignaturas los necesita y quedan para el simulador avanzado de la Fase 3. La app muestra puntos y no una nota final, porque la conversión sigue sin confirmar.
+
 ### 6.5 Calendario sin duplicados
 
 `CalendarProjector` une estas fuentes en una lista de entradas, cada una con un enlace a su origen:

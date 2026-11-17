@@ -9,3 +9,16 @@ final toLocalProvider = Provider<DateTime Function(DateTime)>(
   (ref) =>
       (instant) => instant.toLocal(),
 );
+
+/// Convierte una fecha y hora de pared del dispositivo en un instante. Las
+/// pruebas lo sustituyen junto con [toLocalProvider].
+final fromLocalProvider = Provider<DateTime Function(DateTime)>(
+  (ref) =>
+      (wall) => DateTime(
+        wall.year,
+        wall.month,
+        wall.day,
+        wall.hour,
+        wall.minute,
+      ).toUtc(),
+);

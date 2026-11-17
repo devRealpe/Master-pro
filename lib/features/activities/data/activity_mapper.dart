@@ -21,6 +21,10 @@ String _text(Object? value) => value is String ? value : '';
 DateTime? _instant(Object? value) =>
     value is String ? DateTime.tryParse(value)?.toUtc() : null;
 
+/// Firestore devuelve los números como `int` o `double` según su valor.
+double? _nonNegative(Object? value) =>
+    value is num && value >= 0 ? value.toDouble() : null;
+
 String? _iso(DateTime? instant) => instant?.toUtc().toIso8601String();
 
 Map<String, Object?> activityToMap(Activity activity) => {
@@ -36,6 +40,8 @@ Map<String, Object?> activityToMap(Activity activity) => {
   'bufferDays': activity.bufferDays,
   'submittedAt': _iso(activity.submittedAt),
   'estimateMinutes': activity.estimateMinutes,
+  'value': activity.value,
+  'score': activity.score,
   'subtasks': [
     for (final subtask in activity.subtasks)
       {'id': subtask.id, 'title': subtask.title, 'done': subtask.done},
@@ -87,6 +93,8 @@ Activity activityFromMap(String id, Map<String, Object?> map) {
         : Activity.defaultBufferDays,
     submittedAt: _instant(map['submittedAt']),
     estimateMinutes: estimate is int && estimate > 0 ? estimate : null,
+    value: _nonNegative(map['value']),
+    score: _nonNegative(map['score']),
     subtasks: [
       if (subtasks is List)
         for (final raw in subtasks) ?_subtaskFromMap(raw),

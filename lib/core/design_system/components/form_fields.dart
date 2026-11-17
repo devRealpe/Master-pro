@@ -16,6 +16,7 @@ class DateField extends StatelessWidget {
     this.firstDate,
     this.lastDate,
     this.errorText,
+    this.clearable = true,
   });
 
   final String label;
@@ -24,6 +25,9 @@ class DateField extends StatelessWidget {
   final DateTime? firstDate;
   final DateTime? lastDate;
   final String? errorText;
+
+  /// Falso cuando la fecha es obligatoria: no se ofrece quitarla.
+  final bool clearable;
 
   Future<void> _pick(BuildContext context) async {
     final today = Dates.today();
@@ -49,7 +53,7 @@ class DateField extends StatelessWidget {
         decoration: InputDecoration(
           labelText: label,
           errorText: errorText,
-          suffixIcon: value == null
+          suffixIcon: value == null || !clearable
               ? Icon(LucideIcons.calendar, size: 20, color: c.inkMuted)
               : IconButton(
                   tooltip: 'Quitar fecha',

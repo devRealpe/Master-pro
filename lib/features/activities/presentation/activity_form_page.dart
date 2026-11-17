@@ -4,10 +4,12 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../core/design_system/design_system.dart';
+import '../../../core/format/decimals.dart';
 import '../../../core/sync/write_guard.dart';
 import '../../../core/time/clock_providers.dart';
 import '../../../core/time/dates.dart';
 import '../../../core/time/deadline_clock.dart';
+import '../../grades/domain/grading_scheme.dart';
 import '../../subjects/domain/subject.dart';
 import '../../subjects/presentation/subjects_providers.dart';
 import '../domain/activity.dart';
@@ -71,6 +73,13 @@ class _ActivityFormState extends ConsumerState<_ActivityForm> {
     },
   );
 
+  late final _value = TextEditingController(
+    text: switch (_original?.value) {
+      final value? => Decimals.format(value),
+      null => '',
+    },
+  );
+
   late String? _subjectId = _original?.subjectId ?? widget.subjectId;
   late ActivityType _type = _original?.type ?? ActivityType.work;
   late ActivityStatus _status = _original?.status ?? ActivityStatus.backlog;
@@ -105,6 +114,7 @@ class _ActivityFormState extends ConsumerState<_ActivityForm> {
     _description.dispose();
     _notes.dispose();
     _estimate.dispose();
+    _value.dispose();
     super.dispose();
   }
 
@@ -119,10 +129,36 @@ class _ActivityFormState extends ConsumerState<_ActivityForm> {
     );
   }
 
+  /// Vacío es válido: la actividad no puntúa.
+  bool get _valueValid =>
+      _value.text.trim().isEmpty ||
+      GradingRules.points(Decimals.parse(_value.text)) == null;
+
+  /// Reglas de la asignatura elegida, o las de UNIR si no hay ninguna.
+  GradingScheme get _scheme {
+    final subjects = ref.read(subjectsProvider).value ?? const <Subject>[];
+    return subjects.where((s) => s.id == _subjectId).firstOrNull?.grading ??
+        GradingScheme.unir;
+  }
+
+  void _selectType(ActivityType type) {
+    setState(() {
+      _type = type;
+      // Un test suma por hacerlo: se propone su valor si aún no hay ninguno.
+      if (type == ActivityType.test && _value.text.trim().isEmpty) {
+        _value.text = Decimals.format(_scheme.testPoints);
+      }
+    });
+  }
+
   void _save() {
     setState(() => _submitted = true);
     final estimate = ActivityRules.estimate(_estimate.text);
-    if (ActivityRules.title(_title.text) != null || !estimate.valid) return;
+    if (ActivityRules.title(_title.text) != null ||
+        !estimate.valid ||
+        !_valueValid) {
+      return;
+    }
 
     final repository = ref.read(activitiesRepositoryProvider);
     final original = _original;
@@ -139,6 +175,7 @@ class _ActivityFormState extends ConsumerState<_ActivityForm> {
           dueZone: _zone,
           bufferDays: _buffer,
           estimateMinutes: estimate.minutes,
+          value: Decimals.parse(_value.text),
         );
 
     guardWrite(
@@ -220,7 +257,7 @@ class _ActivityFormState extends ConsumerState<_ActivityForm> {
               for (final type in ActivityType.values)
                 DropdownMenuItem(value: type, child: Text(type.label)),
             ],
-            onChanged: (type) => setState(() => _type = type ?? _type),
+            onChanged: (type) => _selectType(type ?? _type),
           ),
 
           const SizedBox(height: AppSpacing.xl),
@@ -330,6 +367,31 @@ class _ActivityFormState extends ConsumerState<_ActivityForm> {
               hintText: '1,5',
               suffixText: 'horas',
               errorText: estimateError,
+            ),
+          ),
+
+          const SizedBox(height: AppSpacing.xl),
+          Text('Calificación', style: text.titleMedium),
+          const SizedBox(height: AppSpacing.xxs),
+          Text(
+            'Lo máximo que puede aportar a la evaluación continua. Lo ves en '
+            '«Actividades y test» del campus. Déjalo vacío si no puntúa.',
+            style: text.bodyMedium!.copyWith(color: c.inkSoft),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          TextField(
+            controller: _value,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            onChanged: (_) {
+              if (_submitted) setState(() {});
+            },
+            decoration: InputDecoration(
+              labelText: 'Valor',
+              hintText: '5',
+              suffixText: 'puntos',
+              errorText: _submitted && !_valueValid
+                  ? 'Escribe un número, por ejemplo 5 o 0,1'
+                  : null,
             ),
           ),
 

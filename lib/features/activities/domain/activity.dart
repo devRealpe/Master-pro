@@ -87,6 +87,8 @@ class Activity {
     this.bufferDays = defaultBufferDays,
     this.submittedAt,
     this.estimateMinutes,
+    this.value,
+    this.score,
     this.subtasks = const [],
     this.deletedAt,
   });
@@ -119,11 +121,23 @@ class Activity {
   /// Momento real de la entrega. Es lo que significa «entregada».
   final DateTime? submittedAt;
   final int? estimateMinutes;
+
+  /// Puntos de evaluación continua que puede aportar como máximo. `null` si
+  /// la actividad no puntúa.
+  final double? value;
+
+  /// Nota obtenida, en la escala de la asignatura. `null` si no está
+  /// calificada.
+  final double? score;
   final List<Subtask> subtasks;
   final DateTime? deletedAt;
 
   bool get isDeleted => deletedAt != null;
   bool get isSubmitted => submittedAt != null;
+  bool get isGraded => score != null;
+
+  /// Cuenta para la evaluación continua.
+  bool get countsForGrade => (value ?? 0) > 0;
 
   /// Hecha: finalizada en el flujo o ya entregada.
   bool get isDone => status == ActivityStatus.done || isSubmitted;
@@ -183,6 +197,8 @@ class Activity {
     int? bufferDays,
     Object? submittedAt = _keep,
     Object? estimateMinutes = _keep,
+    Object? value = _keep,
+    Object? score = _keep,
     List<Subtask>? subtasks,
     Object? deletedAt = _keep,
   }) => Activity(
@@ -205,6 +221,8 @@ class Activity {
     estimateMinutes: identical(estimateMinutes, _keep)
         ? this.estimateMinutes
         : estimateMinutes as int?,
+    value: identical(value, _keep) ? this.value : value as double?,
+    score: identical(score, _keep) ? this.score : score as double?,
     subtasks: subtasks ?? this.subtasks,
     deletedAt: identical(deletedAt, _keep)
         ? this.deletedAt
@@ -252,6 +270,8 @@ class Activity {
       other.bufferDays == bufferDays &&
       other.submittedAt == submittedAt &&
       other.estimateMinutes == estimateMinutes &&
+      other.value == value &&
+      other.score == score &&
       other.deletedAt == deletedAt &&
       _sameSubtasks(other.subtasks, subtasks);
 
@@ -278,6 +298,8 @@ class Activity {
     bufferDays,
     submittedAt,
     estimateMinutes,
+    value,
+    score,
     deletedAt,
     Object.hashAll(subtasks),
   );

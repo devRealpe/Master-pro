@@ -38,7 +38,17 @@ class AppCard extends StatelessWidget {
     final content = Padding(padding: padding, child: child);
 
     if (onTap == null) {
-      return DecoratedBox(decoration: decoration, child: content);
+      // La superficie Material transparente permite que los controles de
+      // Material que van dentro (interruptores, casillas, filas de lista)
+      // dibujen sus ondas sobre la tarjeta.
+      return DecoratedBox(
+        decoration: decoration,
+        child: Material(
+          type: MaterialType.transparency,
+          borderRadius: borderRadius,
+          child: content,
+        ),
+      );
     }
     return Pressable(
       onTap: onTap,

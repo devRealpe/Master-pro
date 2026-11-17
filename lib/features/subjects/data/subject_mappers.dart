@@ -1,4 +1,5 @@
 import '../../../core/time/dates.dart';
+import '../../grades/domain/grading_scheme.dart';
 import '../domain/period.dart';
 import '../domain/subject.dart';
 
@@ -22,6 +23,38 @@ String _text(Object? value) => value is String ? value : '';
 DateTime? _instant(Object? value) =>
     value is String ? DateTime.tryParse(value) : null;
 
+Map<String, Object?> gradingToMap(GradingScheme scheme) => {
+  'scaleMax': scheme.scaleMax,
+  'pointsGoal': scheme.pointsGoal,
+  'attendancePoints': scheme.attendancePoints,
+  'testPoints': scheme.testPoints,
+  'continuousWeight': scheme.continuousWeight,
+  'examWeight': scheme.examWeight,
+  'confirmed': scheme.confirmed,
+};
+
+/// Lee las reglas de evaluación. Lo que falta o no es válido toma el valor de
+/// la plantilla de UNIR; un documento sin reglas las recibe completas.
+GradingScheme gradingFromMap(Object? value) {
+  if (value is! Map) return GradingScheme.unir;
+  double read(String key, double fallback, {bool positive = false}) {
+    final raw = value[key];
+    if (raw is! num || raw < 0 || (positive && raw <= 0)) return fallback;
+    return raw.toDouble();
+  }
+
+  const base = GradingScheme.unir;
+  return GradingScheme(
+    scaleMax: read('scaleMax', base.scaleMax, positive: true),
+    pointsGoal: read('pointsGoal', base.pointsGoal),
+    attendancePoints: read('attendancePoints', base.attendancePoints),
+    testPoints: read('testPoints', base.testPoints),
+    continuousWeight: read('continuousWeight', base.continuousWeight),
+    examWeight: read('examWeight', base.examWeight),
+    confirmed: value['confirmed'] == true,
+  );
+}
+
 Map<String, Object?> subjectToMap(Subject subject) => {
   'name': subject.name,
   'teacher': subject.teacher,
@@ -31,6 +64,7 @@ Map<String, Object?> subjectToMap(Subject subject) => {
   'endDate': Dates.toIso(subject.endDate),
   'status': subject.status.name,
   'colorIndex': subject.colorIndex,
+  'grading': gradingToMap(subject.grading),
   'deletedAt': subject.deletedAt?.toUtc().toIso8601String(),
   'schemaVersion': _schemaVersion,
 };
@@ -49,6 +83,7 @@ Subject subjectFromMap(String id, Map<String, Object?> map) => Subject(
     SubjectStatus.active,
   ),
   colorIndex: map['colorIndex'] is int ? map['colorIndex']! as int : 0,
+  grading: gradingFromMap(map['grading']),
   deletedAt: _instant(map['deletedAt']),
 );
 

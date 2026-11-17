@@ -8,6 +8,7 @@ import '../../features/activities/presentation/activity_form_page.dart';
 import '../../features/auth/presentation/auth_providers.dart';
 import '../../features/auth/presentation/sign_in_page.dart';
 import '../../features/calendar/presentation/calendar_page.dart';
+import '../../features/grades/presentation/simulator_page.dart';
 import '../../features/home/presentation/home_page.dart';
 import '../../features/plan/presentation/plan_page.dart';
 import '../../features/subjects/presentation/periods_page.dart';
@@ -35,6 +36,8 @@ abstract final class AppRoutes {
   static const periods = '/periodos';
   static String subject(String id) => '/asignatura/$id';
   static String editSubject(String id) => '/asignatura/$id/editar';
+  static String simulator(String subjectId) =>
+      '/asignatura/$subjectId/simulador';
 
   /// Mientras se restaura la sesión guardada.
   static const splash = '/abriendo';
@@ -164,6 +167,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: 'editar',
             builder: (_, state) =>
                 SubjectFormPage(subjectId: state.pathParameters['id']),
+          ),
+          GoRoute(
+            path: 'simulador',
+            builder: (_, state) =>
+                SimulatorPage(subjectId: state.pathParameters['id']!),
           ),
         ],
       ),

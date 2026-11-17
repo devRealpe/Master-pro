@@ -10,6 +10,8 @@ import '../../../core/time/dates.dart';
 import '../../activities/domain/activity.dart';
 import '../../activities/presentation/activities_providers.dart';
 import '../../activities/presentation/activity_card.dart';
+import '../../classes/presentation/classes_section.dart';
+import '../../grades/presentation/grade_marker_card.dart';
 import '../domain/period.dart';
 import '../domain/subject.dart';
 import 'subject_form_page.dart';
@@ -200,7 +202,9 @@ class _Detail extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          FadeSlideIn(index: 1, child: _TimelineCard(subject: subject)),
+          FadeSlideIn(index: 1, child: GradeMarkerCard(subject: subject)),
+          const SizedBox(height: AppSpacing.sm),
+          FadeSlideIn(index: 2, child: _TimelineCard(subject: subject)),
           if (subject.description.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.sm),
             FadeSlideIn(
@@ -219,6 +223,8 @@ class _Detail extends ConsumerWidget {
           ],
           const SizedBox(height: AppSpacing.lg),
           FadeSlideIn(index: 3, child: _SubjectActivities(subject: subject)),
+          const SizedBox(height: AppSpacing.lg),
+          FadeSlideIn(index: 4, child: ClassesSection(subject: subject)),
         ],
       ),
     );

@@ -8,11 +8,13 @@ import '../../../core/design_system/design_system.dart';
 import '../../../core/sync/write_guard.dart';
 import '../../../core/time/clock_providers.dart';
 import '../../../core/time/deadline_clock.dart';
+import '../../grades/domain/grading_scheme.dart';
 import '../../subjects/domain/subject.dart';
 import '../../subjects/presentation/subjects_providers.dart';
 import '../domain/activity.dart';
 import 'activities_providers.dart';
 import 'activity_card.dart';
+import 'activity_grade_card.dart';
 
 /// Detalle de una actividad: fecha límite, estado, pasos y notas.
 class ActivityDetailPage extends ConsumerWidget {
@@ -207,6 +209,16 @@ class _Detail extends ConsumerWidget {
               ),
             ),
           ),
+          if (activity.countsForGrade) ...[
+            const SizedBox(height: AppSpacing.sm),
+            FadeSlideIn(
+              index: 3,
+              child: ActivityGradeCard(
+                activity: activity,
+                scheme: subject?.grading ?? GradingScheme.unir,
+              ),
+            ),
+          ],
           const SizedBox(height: AppSpacing.sm),
           FadeSlideIn(
             index: 3,
